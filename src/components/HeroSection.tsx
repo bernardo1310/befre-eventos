@@ -13,11 +13,9 @@ const HeroSection = () => {
         <img
           src={heroImg}
           alt="BeFre Eventos - Estrutura de iluminação e som"
-          className="h-full w-full object-cover"
+          className="h-full w-full object-cover blur-sm scale-105"
         />
-        <div className="hero-overlay absolute inset-0" />
-        {/* Subtle light effects */}
-        <div className="absolute inset-0 bg-gradient-to-tr from-gold/5 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-background/70" />
       </div>
 
       {/* Content */}
