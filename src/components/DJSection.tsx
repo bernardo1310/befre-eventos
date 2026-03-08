@@ -1,6 +1,8 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { Music, Headphones, Award, Mic } from "lucide-react";
+import djPhoto1 from "@/assets/dj1.png";
+import djPhoto2 from "@/assets/dj2.png";
 
 const features = [
   { icon: Music, text: "Repertório open format" },
@@ -24,12 +26,7 @@ const DJSection = () => {
             animate={inView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.9 }}
           >
-            <div className="flex h-full items-center justify-center">
-              <div className="text-center">
-                <Headphones className="mx-auto h-20 w-20 text-primary/40" />
-                <p className="mt-4 text-sm text-muted-foreground">DJ Adriano Coelho</p>
-              </div>
-            </div>
+            <img src={djPhoto1} alt="DJ Adriano Coelho" className="h-full w-full object-cover" />
           </motion.div>
 
           {/* Content */}
