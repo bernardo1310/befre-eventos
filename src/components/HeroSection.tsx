@@ -23,7 +23,7 @@ const HeroSection = () => {
         <motion.img
           src={logo}
           alt="BeFre Eventos"
-          className="mb-8 h-24 w-auto md:h-32 lg:h-40"
+          className="mb-10 h-36 w-auto md:h-48 lg:h-56"
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, ease: "easeOut" }}
