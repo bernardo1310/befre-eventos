@@ -55,18 +55,21 @@ const DJSection = () => {
             </div>
 
             <div className="mt-10 grid grid-cols-2 gap-4">
-              {features.map((f, i) => (
-                <motion.div
-                  key={f.text}
-                  className="glass flex items-center gap-3 rounded-xl p-4 transition-all duration-300 hover:glow-gold"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={inView ? { opacity: 1, y: 0 } : {}}
-                  transition={{ duration: 0.5, delay: 0.4 + i * 0.1 }}
-                >
-                  <f.icon className="h-5 w-5 shrink-0 text-primary" />
-                  <span className="text-xs text-foreground">{f.text}</span>
-                </motion.div>
-              ))}
+              {features.map((f, i) => {
+                const Icon = f.icon;
+                return (
+                  <motion.div
+                    key={f.text}
+                    className="glass flex items-center gap-3 rounded-xl p-4"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={inView ? { opacity: 1, y: 0 } : {}}
+                    transition={{ duration: 0.5, delay: 0.4 + i * 0.1 }}
+                  >
+                    <Icon className="h-5 w-5 shrink-0 text-primary" />
+                    <span className="text-xs text-foreground">{f.text}</span>
+                  </motion.div>
+                );
+              })}
             </div>
           </motion.div>
         </div>
