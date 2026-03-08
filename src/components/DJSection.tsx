@@ -1,6 +1,8 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { Music, Headphones, Award, Mic } from "lucide-react";
+import djPhoto1 from "@/assets/dj1.png";
+import djPhoto2 from "@/assets/dj2.png";
 
 const features = [
   { icon: Music, text: "Repertório open format" },
