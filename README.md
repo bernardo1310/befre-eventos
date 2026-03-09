@@ -1,4 +1,10 @@
-# Welcome to your Lovable project
+# Befre Eventos - Website
+
+Website profissional para Befre Eventos com seções de apresentação, produtos e galeria.
+
+## 🚀 Deploy
+
+O site está configurado para deploy automático via GitHub Pages em: https://bernardo1310.github.io/befre-eventos/
 
 ## Project info
 
