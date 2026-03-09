@@ -55,6 +55,8 @@ const CalendarSection = () => {
     if (status === "available") {
       const formatted = `${String(day).padStart(2, "0")}/${String(currentMonth + 1).padStart(2, "0")}/${currentYear}`;
       setSelectedDate(formatted);
+      const msg = encodeURIComponent(`Olá! Gostaria de consultar a disponibilidade para meu evento na data ${formatted}.`);
+      window.open(`${WHATSAPP_BASE}?text=${msg}`, "_blank");
     }
   };
 
