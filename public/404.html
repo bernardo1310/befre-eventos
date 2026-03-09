@@ -5,9 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Befre Eventos</title>
     <script>
-        // Redireciona para index.html preservando a rota
-        var path = window.location.pathname.replace('/befre-eventos', '');
-        window.location.href = '/befre-eventos/?' + path;
+        // Para GitHub Pages com subpath
+        var pathPrefix = '/befre-eventos';
+        var currentPath = window.location.pathname;
+        
+        // Se não for a raiz, redireciona para index.html
+        if (!currentPath.endsWith('/') && !currentPath.endsWith('.html')) {
+            var newPath = pathPrefix + '/?path=' + currentPath.replace(pathPrefix, '');
+            window.location.href = newPath;
+        } else {
+            // Caso esteja na raiz, redireciona para index.html
+            window.location.href = pathPrefix + '/';
+        }
     </script>
 </head>
 <body>
