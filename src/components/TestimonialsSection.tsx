@@ -4,23 +4,23 @@ import { Star, ChevronLeft, ChevronRight } from "lucide-react";
 
 const testimonials = [
   {
-    name: "Camila & Rafael",
-    quote: "A estrutura de som e iluminação foi impecável. Nosso casamento ficou inesquecível.",
+    name: "Rubens & Ana",
+    quote: "Celebrar nossas bodas de ouro foi algo muito especial para nós. Não era nosso primeiro casamento, mas o Adriano conseguiu transformar a noite em algo único. Ele construiu cada detalhe do evento e superou completamente nossas expectativas.",
     rating: 5,
   },
   {
-    name: "Juliana & Marcos",
-    quote: "O DJ Adriano fez a festa ser incrível! Todos os convidados elogiaram demais a pista de dança.",
+    name: "Daniela & Fabiano",
+    quote: "Nosso casamento aconteceu há mais de dez anos e tivemos o prazer de contar com a Befre na estrutura e com o Adriano Coelho na organização. Foi um momento muito especial para nós, e todo o trabalho realizado foi simplesmente impecável.",
     rating: 5,
   },
   {
-    name: "Fernanda & Lucas",
-    quote: "Profissionalismo do início ao fim. A iluminação cênica transformou completamente o espaço.",
+    name: "José & Inês",
+    quote: "Adriano foi impecável em cada detalhe. As luzes, o painel e toda a ambientação estavam lindos. Foi um evento inesquecível que ficará marcado para sempre em nossas vidas.",
     rating: 5,
   },
   {
-    name: "Amanda & Thiago",
-    quote: "Superou todas as nossas expectativas. A equipe BeFre é extremamente dedicada e talentosa.",
+    name: "Bernardo — Formatura Galileu 2023",
+    quote: "Sensacional! A estrutura era incrível, com tecnologia de ponta e tudo pensado nos mínimos detalhes para a nossa formatura. O repertório do DJ agradou a todos, passando pela vaneira até o mega funk e mantendo a pista animada a noite inteira. 🎉",
     rating: 5,
   },
 ];
