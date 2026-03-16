@@ -60,12 +60,14 @@ function HeroGeometric({
   title1 = "O melhor para o seu evento",
   title2 = "começa aqui.",
   description = "Sonorização profissional, iluminação cênica e estrutura completa para casamentos, festas e eventos inesquecíveis.",
+  logo,
   children,
 }: {
   badge?: string;
   title1?: string;
   title2?: string;
   description?: string;
+  logo?: string;
   children?: React.ReactNode;
 }) {
   const fadeUpVariants = {
