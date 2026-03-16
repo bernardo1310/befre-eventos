@@ -60,12 +60,14 @@ function HeroGeometric({
   title1 = "O melhor para o seu evento",
   title2 = "começa aqui.",
   description = "Sonorização profissional, iluminação cênica e estrutura completa para casamentos, festas e eventos inesquecíveis.",
+  logo,
   children,
 }: {
   badge?: string;
   title1?: string;
   title2?: string;
   description?: string;
+  logo?: string;
   children?: React.ReactNode;
 }) {
   const fadeUpVariants = {
@@ -133,17 +135,29 @@ function HeroGeometric({
       {/* Content */}
       <div className="relative z-10 mx-auto max-w-7xl px-6 text-center">
         {/* Badge */}
-        <motion.div
-          custom={0}
-          variants={fadeUpVariants}
-          initial="hidden"
-          animate="visible"
-          className="mb-8 inline-flex items-center gap-2 rounded-full border border-border/50 bg-card/50 backdrop-blur-sm px-4 py-1.5"
-        >
-          <span className="text-xs text-muted-foreground font-medium">
-            {badge}
-          </span>
-        </motion.div>
+        {logo ? (
+          <motion.div
+            custom={0}
+            variants={fadeUpVariants}
+            initial="hidden"
+            animate="visible"
+            className="mb-8"
+          >
+            <img src={logo} alt="BeFre Eventos" className="h-16 md:h-20 w-auto mx-auto" />
+          </motion.div>
+        ) : badge ? (
+          <motion.div
+            custom={0}
+            variants={fadeUpVariants}
+            initial="hidden"
+            animate="visible"
+            className="mb-8 inline-flex items-center gap-2 rounded-full border border-border/50 bg-card/50 backdrop-blur-sm px-4 py-1.5"
+          >
+            <span className="text-xs text-muted-foreground font-medium">
+              {badge}
+            </span>
+          </motion.div>
+        ) : null}
 
         {/* Title */}
         <motion.div custom={1} variants={fadeUpVariants} initial="hidden" animate="visible">

@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { HeroGeometric } from "@/components/ui/shape-landing-hero";
+import logo from "@/assets/logo.png";
 
 const WHATSAPP_LINK = "https://wa.me/5547999988040";
 
@@ -8,10 +9,11 @@ const HeroSection = () => {
   return (
     <section className="relative">
       <HeroGeometric
-        badge="BeFre Eventos"
+        badge=""
         title1="O melhor para o seu evento"
         title2="começa aqui."
         description="Sonorização profissional, iluminação cênica e estrutura completa para casamentos, festas e eventos inesquecíveis."
+        logo={logo}
       >
         <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center">
           <a
