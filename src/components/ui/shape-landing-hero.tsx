@@ -135,17 +135,29 @@ function HeroGeometric({
       {/* Content */}
       <div className="relative z-10 mx-auto max-w-7xl px-6 text-center">
         {/* Badge */}
-        <motion.div
-          custom={0}
-          variants={fadeUpVariants}
-          initial="hidden"
-          animate="visible"
-          className="mb-8 inline-flex items-center gap-2 rounded-full border border-border/50 bg-card/50 backdrop-blur-sm px-4 py-1.5"
-        >
-          <span className="text-xs text-muted-foreground font-medium">
-            {badge}
-          </span>
-        </motion.div>
+        {logo ? (
+          <motion.div
+            custom={0}
+            variants={fadeUpVariants}
+            initial="hidden"
+            animate="visible"
+            className="mb-8"
+          >
+            <img src={logo} alt="BeFre Eventos" className="h-16 md:h-20 w-auto mx-auto" />
+          </motion.div>
+        ) : badge ? (
+          <motion.div
+            custom={0}
+            variants={fadeUpVariants}
+            initial="hidden"
+            animate="visible"
+            className="mb-8 inline-flex items-center gap-2 rounded-full border border-border/50 bg-card/50 backdrop-blur-sm px-4 py-1.5"
+          >
+            <span className="text-xs text-muted-foreground font-medium">
+              {badge}
+            </span>
+          </motion.div>
+        ) : null}
 
         {/* Title */}
         <motion.div custom={1} variants={fadeUpVariants} initial="hidden" animate="visible">
