@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { HeroGeometric } from "@/components/ui/shape-landing-hero";
+import logo from "@/assets/logo.png";
 
 const WHATSAPP_LINK = "https://wa.me/5547999988040";
 
