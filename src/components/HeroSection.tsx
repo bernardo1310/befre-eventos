@@ -54,7 +54,7 @@ const HeroSection = () => {
           <img
             src={logo}
             alt="BeFre Eventos"
-            className="mx-auto w-56 md:w-72 lg:w-80 max-w-[320px] h-auto drop-shadow-2xl"
+            className="mx-auto w-72 md:w-96 lg:w-[420px] max-w-[420px] h-auto drop-shadow-2xl"
           />
         </motion.div>
 
