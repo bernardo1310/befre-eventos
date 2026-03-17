@@ -58,22 +58,6 @@
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
-    background-image:
-      /* Radial vignette lighting */
-      radial-gradient(ellipse at 50% 40%, hsla(0,0%,18%,0.18) 0%, hsla(0,0%,4%,0.95) 70%),
-      /* Subtle grid pattern */
-      linear-gradient(hsla(0,0%,100%,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, hsla(0,0%,100%,0.03) 1px, transparent 1px),
-      /* Noise-like texture via tiny gradient dots */
-      radial-gradient(circle at 25% 25%, hsla(0,0%,100%,0.02) 1px, transparent 1px),
-      radial-gradient(circle at 75% 75%, hsla(0,0%,100%,0.015) 1px, transparent 1px);
-    background-size:
-      100% 100%,
-      80px 80px,
-      80px 80px,
-      4px 4px,
-      6px 6px;
-    background-attachment: fixed;
   }
 
   html {
