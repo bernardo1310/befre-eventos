@@ -1,8 +1,10 @@
 import { motion, useInView } from "framer-motion";
-import { useRef, useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-
-const WHATSAPP_BASE = "https://wa.me/5547999988040";
+import { useRef, useState, useEffect, useMemo } from "react";
+import { ChevronLeft, ChevronRight, Lock } from "lucide-react";
+import { EventItem, loadEvents, saveEvents, getEventsForDate, generateId } from "@/data/events";
+import { useAuth } from "@/contexts/AuthContext";
+import EventModal from "@/components/EventModal";
+import { AdminLoginDialog, AdminLogoutButton } from "@/components/AdminLogin";
 
 const MONTHS = [
   "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
@@ -10,19 +12,6 @@ const MONTHS = [
 ];
 
 const WEEKDAYS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
-
-// Sample data: status per date key "YYYY-MM-DD"
-const sampleEvents: Record<string, "reserved" | "full"> = {
-  "2026-03-14": "reserved",
-  "2026-03-21": "full",
-  "2026-03-28": "reserved",
-  "2026-04-04": "reserved",
-  "2026-04-18": "full",
-  "2026-05-09": "reserved",
-  "2026-05-23": "reserved",
-  "2026-06-06": "full",
-  "2026-06-20": "reserved",
-};
 
 function getDaysInMonth(year: number, month: number) {
   return new Date(year, month + 1, 0).getDate();
@@ -35,51 +24,123 @@ function getFirstDayOfMonth(year: number, month: number) {
 const CalendarSection = () => {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-100px" });
-  const [currentMonth, setCurrentMonth] = useState(2); // March
-  const [currentYear] = useState(2026);
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const today = new Date();
+  const [currentMonth, setCurrentMonth] = useState(today.getMonth());
+  const [currentYear, setCurrentYear] = useState(today.getFullYear());
+  const [events, setEvents] = useState<EventItem[]>([]);
+  const [selectedDateKey, setSelectedDateKey] = useState<string | null>(null);
+  const [showLogin, setShowLogin] = useState(false);
+  const { isAdmin } = useAuth();
+
+  useEffect(() => {
+    setEvents(loadEvents());
+  }, []);
 
   const daysInMonth = getDaysInMonth(currentYear, currentMonth);
   const firstDay = getFirstDayOfMonth(currentYear, currentMonth);
 
-  const prev = () => setCurrentMonth((m) => (m === 0 ? 11 : m - 1));
-  const next = () => setCurrentMonth((m) => (m === 11 ? 0 : m + 1));
+  // Count events per day for current month
+  const eventCountMap = useMemo(() => {
+    const map: Record<number, number> = {};
+    for (let d = 1; d <= daysInMonth; d++) {
+      const key = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+      const count = getEventsForDate(events, key).length;
+      if (count > 0) map[d] = count;
+    }
+    return map;
+  }, [events, currentMonth, currentYear, daysInMonth]);
 
-  const getStatus = (day: number) => {
-    const key = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-    return sampleEvents[key] || "available";
-  };
-
-  const handleDateClick = (day: number) => {
-    const status = getStatus(day);
-    if (status === "available") {
-      const formatted = `${String(day).padStart(2, "0")}/${String(currentMonth + 1).padStart(2, "0")}/${currentYear}`;
-      setSelectedDate(formatted);
-      const msg = encodeURIComponent(`Olá! Gostaria de consultar a disponibilidade para meu evento na data ${formatted}.`);
-      window.open(`${WHATSAPP_BASE}?text=${msg}`, "_blank");
+  const prev = () => {
+    if (currentMonth === 0) {
+      setCurrentMonth(11);
+      setCurrentYear((y) => y - 1);
+    } else {
+      setCurrentMonth((m) => m - 1);
     }
   };
 
-  const statusStyles = {
-    available: "text-green-400 hover:bg-green-400/10 cursor-pointer",
-    reserved: "text-yellow-400 bg-yellow-400/10",
-    full: "text-red-400 bg-red-400/10",
+  const next = () => {
+    if (currentMonth === 11) {
+      setCurrentMonth(0);
+      setCurrentYear((y) => y + 1);
+    } else {
+      setCurrentMonth((m) => m + 1);
+    }
+  };
+
+  const makeDateKey = (day: number) =>
+    `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+
+  const handleDayClick = (day: number) => {
+    setSelectedDateKey(makeDateKey(day));
+  };
+
+  const selectedEvents = selectedDateKey ? getEventsForDate(events, selectedDateKey) : [];
+
+  const formatDateLabel = (key: string) => {
+    const [y, m, d] = key.split("-");
+    return `${d}/${m}/${y}`;
+  };
+
+  const handleSaveEvent = (event: EventItem) => {
+    setEvents((prev) => {
+      const exists = prev.findIndex((e) => e.id === event.id);
+      let updated: EventItem[];
+      if (exists >= 0) {
+        updated = [...prev];
+        updated[exists] = event;
+      } else {
+        updated = [...prev, event];
+      }
+      saveEvents(updated);
+      return updated;
+    });
+  };
+
+  const handleDeleteEvent = (id: string) => {
+    setEvents((prev) => {
+      const updated = prev.filter((e) => e.id !== id);
+      saveEvents(updated);
+      return updated;
+    });
   };
 
   return (
     <section id="agenda" className="section-padding" ref={ref}>
       <div className="mx-auto max-w-2xl">
-        <motion.h2
-          className="heading-display text-center text-3xl md:text-4xl lg:text-5xl"
+        <motion.div
+          className="flex items-center justify-center gap-4"
           initial={{ opacity: 0, y: 30 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8 }}
         >
-          <span className="text-gradient-gold">Agenda</span>
-        </motion.h2>
+          <h2 className="heading-display text-center text-3xl md:text-4xl lg:text-5xl">
+            <span className="text-gradient-gold">Agenda</span>
+          </h2>
+        </motion.div>
+
+        {/* Admin controls */}
+        <motion.div
+          className="mt-4 flex items-center justify-center gap-3"
+          initial={{ opacity: 0 }}
+          animate={inView ? { opacity: 1 } : {}}
+          transition={{ duration: 0.8, delay: 0.1 }}
+        >
+          {isAdmin ? (
+            <AdminLogoutButton />
+          ) : (
+            <button
+              onClick={() => setShowLogin(true)}
+              className="flex items-center gap-2 rounded-full border border-border/30 bg-muted/30 px-4 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
+            >
+              <Lock className="h-3.5 w-3.5" />
+              Admin
+            </button>
+          )}
+        </motion.div>
 
         <motion.div
-          className="mt-12 glass-strong rounded-2xl p-6 md:p-8"
+          className="mt-8 glass-strong rounded-2xl p-6 md:p-8"
           initial={{ opacity: 0, y: 30 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8, delay: 0.2 }}
@@ -112,14 +173,27 @@ const CalendarSection = () => {
               <div key={`empty-${i}`} />
             ))}
             {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((day) => {
-              const status = getStatus(day);
+              const count = eventCountMap[day] || 0;
+              const hasEvents = count > 0;
               return (
                 <button
                   key={day}
-                  onClick={() => handleDateClick(day)}
-                  className={`aspect-square flex items-center justify-center rounded-lg text-sm font-medium transition-all duration-200 ${statusStyles[status]}`}
+                  onClick={() => handleDayClick(day)}
+                  title={hasEvents ? `${count} evento${count > 1 ? "s" : ""}` : "Sem eventos"}
+                  className={`relative aspect-square flex flex-col items-center justify-center rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer
+                    ${hasEvents
+                      ? "text-primary hover:bg-primary/10 font-semibold"
+                      : "text-foreground/60 hover:bg-muted/40"
+                    }`}
                 >
                   {day}
+                  {hasEvents && (
+                    <span className="absolute bottom-1 flex gap-0.5">
+                      {Array.from({ length: Math.min(count, 3) }).map((_, i) => (
+                        <span key={i} className="h-1 w-1 rounded-full bg-primary" />
+                      ))}
+                    </span>
+                  )}
                 </button>
               );
             })}
@@ -128,38 +202,34 @@ const CalendarSection = () => {
           {/* Legend */}
           <div className="mt-6 flex flex-wrap justify-center gap-6 text-xs text-muted-foreground">
             <span className="flex items-center gap-2">
-              <span className="h-2.5 w-2.5 rounded-full bg-green-400" /> Disponível
+              <span className="h-2.5 w-2.5 rounded-full bg-primary" /> Com eventos
             </span>
             <span className="flex items-center gap-2">
-              <span className="h-2.5 w-2.5 rounded-full bg-yellow-400" /> Reservado
+              <span className="h-2.5 w-2.5 rounded-full bg-muted-foreground/30" /> Sem eventos
             </span>
-            <span className="flex items-center gap-2">
-              <span className="h-2.5 w-2.5 rounded-full bg-red-400" /> Lotado
-            </span>
+            {isAdmin && (
+              <span className="flex items-center gap-2 text-primary">
+                ✏️ Modo Admin ativo
+              </span>
+            )}
           </div>
-
-          {/* Selected date CTA */}
-          {selectedDate && (
-            <motion.div
-              className="mt-6 text-center"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-            >
-              <p className="mb-3 text-sm text-foreground">
-                Data selecionada: <strong>{selectedDate}</strong>
-              </p>
-              <a
-                href={`${WHATSAPP_BASE}?text=${encodeURIComponent(`Olá! Gostaria de consultar a disponibilidade para meu evento na data ${selectedDate}.`)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary/25"
-              >
-                Reservar minha data
-              </a>
-            </motion.div>
-          )}
         </motion.div>
       </div>
+
+      {/* Event modal */}
+      {selectedDateKey && (
+        <EventModal
+          dateLabel={formatDateLabel(selectedDateKey)}
+          dateKey={selectedDateKey}
+          events={selectedEvents}
+          onClose={() => setSelectedDateKey(null)}
+          onSave={handleSaveEvent}
+          onDelete={handleDeleteEvent}
+        />
+      )}
+
+      {/* Login dialog */}
+      {showLogin && <AdminLoginDialog onClose={() => setShowLogin(false)} />}
     </section>
   );
 };
