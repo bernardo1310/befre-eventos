@@ -1,5 +1,5 @@
 import { ContainerScroll } from "@/components/ui/container-scroll-animation";
-import event1 from "@/assets/event1.png";
+import showcaseDj from "@/assets/showcase-dj.png";
 
 const ShowcaseSection = () => {
   return (
@@ -17,8 +17,8 @@ const ShowcaseSection = () => {
         }
       >
         <img
-          src={event1}
-          alt="Evento BeFre com iluminação profissional"
+          src={showcaseDj}
+          alt="DJ profissional BeFre com mesa de mixagem e iluminação"
           className="mx-auto h-full w-full object-cover object-center"
           draggable={false}
         />

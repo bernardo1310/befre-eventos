@@ -1,45 +1,49 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import type { Session } from "@supabase/supabase-js";
 
 interface AuthContextType {
   isAdmin: boolean;
-  login: (password: string) => boolean;
-  logout: () => void;
+  session: Session | null;
+  login: (email: string, password: string) => Promise<{ error: string | null }>;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
   isAdmin: false,
-  login: () => false,
-  logout: () => {},
+  session: null,
+  login: async () => ({ error: null }),
+  logout: async () => {},
 });
 
-const ADMIN_KEY = "befre_admin_session";
-// Simple prototype password — NOT secure for production
-const ADMIN_PASSWORD = "befre2026";
-
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [session, setSession] = useState<Session | null>(null);
 
   useEffect(() => {
-    const session = localStorage.getItem(ADMIN_KEY);
-    if (session === "true") setIsAdmin(true);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  const login = (password: string): boolean => {
-    if (password === ADMIN_PASSWORD) {
-      setIsAdmin(true);
-      localStorage.setItem(ADMIN_KEY, "true");
-      return true;
-    }
-    return false;
+  const login = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    return { error: error?.message || null };
   };
 
-  const logout = () => {
-    setIsAdmin(false);
-    localStorage.removeItem(ADMIN_KEY);
+  const logout = async () => {
+    await supabase.auth.signOut();
   };
+
+  const isAdmin = !!session;
 
   return (
-    <AuthContext.Provider value={{ isAdmin, login, logout }}>
+    <AuthContext.Provider value={{ isAdmin, session, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
