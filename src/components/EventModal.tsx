@@ -45,7 +45,7 @@ const EventModal = ({ dateLabel, dateKey, events, onClose, onSave, onDelete }: E
     e.preventDefault();
     if (!formTitle.trim()) return;
     const event: EventItem = {
-      id: editing ? editing.id : generateId(),
+      id: editing ? editing.id : crypto.randomUUID(),
       code: formCode.trim(),
       title: formTitle.trim(),
       location: formLocation.trim(),
