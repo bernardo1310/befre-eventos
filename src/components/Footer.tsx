@@ -1,5 +1,8 @@
+import { useState } from "react";
 import logo from "@/assets/logo.png";
-import { Instagram, Phone } from "lucide-react";
+import { Instagram, Phone, Settings } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { AdminLoginDialog, AdminLogoutButton } from "@/components/AdminLogin";
 
 const Footer = () => {
   return (
