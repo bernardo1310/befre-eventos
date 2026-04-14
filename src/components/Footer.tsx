@@ -5,6 +5,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { AdminLoginDialog, AdminLogoutButton } from "@/components/AdminLogin";
 
 const Footer = () => {
+  const { isAdmin } = useAuth();
+  const [showLogin, setShowLogin] = useState(false);
+
   return (
     <footer className="border-t border-border bg-card/40 px-6 py-16 md:px-12">
       <div className="mx-auto max-w-7xl">
@@ -65,10 +68,25 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="mt-12 border-t border-border pt-8 text-center text-xs text-muted-foreground">
-          © {new Date().getFullYear()} BeFre Eventos. Todos os direitos reservados.
+        <div className="mt-12 border-t border-border pt-8 flex items-center justify-between">
+          <span className="text-xs text-muted-foreground">
+            © {new Date().getFullYear()} BeFre Eventos. Todos os direitos reservados.
+          </span>
+          {isAdmin ? (
+            <AdminLogoutButton />
+          ) : (
+            <button
+              onClick={() => setShowLogin(true)}
+              className="rounded-full p-2 text-muted-foreground/30 transition-colors hover:text-muted-foreground/60"
+              title="Admin"
+            >
+              <Settings className="h-4 w-4" />
+            </button>
+          )}
         </div>
       </div>
+
+      {showLogin && <AdminLoginDialog onClose={() => setShowLogin(false)} />}
     </footer>
   );
 };
