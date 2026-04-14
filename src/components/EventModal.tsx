@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Plus, Pencil, Trash2, Calendar, MapPin, Hash } from "lucide-react";
-import { EventItem, generateId } from "@/data/events";
+import { EventItem } from "@/data/events";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface EventModalProps {
