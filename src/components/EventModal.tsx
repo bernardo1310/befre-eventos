@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Plus, Pencil, Trash2, Calendar, MapPin, Hash } from "lucide-react";
-import { EventItem, generateId } from "@/data/events";
+import { EventItem } from "@/data/events";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface EventModalProps {
@@ -45,7 +45,7 @@ const EventModal = ({ dateLabel, dateKey, events, onClose, onSave, onDelete }: E
     e.preventDefault();
     if (!formTitle.trim()) return;
     const event: EventItem = {
-      id: editing ? editing.id : generateId(),
+      id: editing ? editing.id : crypto.randomUUID(),
       code: formCode.trim(),
       title: formTitle.trim(),
       location: formLocation.trim(),

@@ -9,16 +9,21 @@ interface AdminLoginProps {
 
 export const AdminLoginDialog = ({ onClose }: AdminLoginProps) => {
   const { login } = useAuth();
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (login(password)) {
-      onClose();
+    setLoading(true);
+    setError(null);
+    const result = await login(email, password);
+    if (result.error) {
+      setError("Credenciais inválidas.");
+      setLoading(false);
     } else {
-      setError(true);
-      setTimeout(() => setError(false), 2000);
+      onClose();
     }
   };
 
@@ -48,12 +53,24 @@ export const AdminLoginDialog = ({ onClose }: AdminLoginProps) => {
           </div>
           <form onSubmit={handleSubmit} className="p-6 space-y-4">
             <div>
-              <label className="mb-1.5 block text-sm text-muted-foreground">Senha de administrador</label>
+              <label className="mb-1.5 block text-sm text-muted-foreground">Email</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoFocus
+                required
+                className="w-full rounded-lg border border-border/50 bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
+                placeholder="admin@email.com"
+              />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-sm text-muted-foreground">Senha</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                autoFocus
+                required
                 className="w-full rounded-lg border border-border/50 bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
                 placeholder="Digite a senha"
               />
@@ -64,14 +81,15 @@ export const AdminLoginDialog = ({ onClose }: AdminLoginProps) => {
                 initial={{ opacity: 0, y: -5 }}
                 animate={{ opacity: 1, y: 0 }}
               >
-                Senha incorreta. Tente novamente.
+                {error}
               </motion.p>
             )}
             <button
               type="submit"
-              className="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+              disabled={loading}
+              className="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
             >
-              Entrar
+              {loading ? "Entrando..." : "Entrar"}
             </button>
           </form>
         </motion.div>

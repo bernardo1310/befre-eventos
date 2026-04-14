@@ -1,7 +1,7 @@
 import { motion, useInView } from "framer-motion";
 import { useRef, useState, useEffect, useMemo } from "react";
-import { ChevronLeft, ChevronRight, Lock } from "lucide-react";
-import { EventItem, loadEvents, saveEvents, getEventsForDate, generateId } from "@/data/events";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { EventItem, loadEvents, saveEvent, deleteEvent, getEventsForDate } from "@/data/events";
 import { useAuth } from "@/contexts/AuthContext";
 import EventModal from "@/components/EventModal";
 import { AdminLoginDialog, AdminLogoutButton } from "@/components/AdminLogin";
@@ -32,14 +32,34 @@ const CalendarSection = () => {
   const [showLogin, setShowLogin] = useState(false);
   const { isAdmin } = useAuth();
 
+  // Hidden admin access: triple-click on title
+  const [clickCount, setClickCount] = useState(0);
+  const clickTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleTitleClick = () => {
+    const newCount = clickCount + 1;
+    setClickCount(newCount);
+    if (clickTimer.current) clearTimeout(clickTimer.current);
+    if (newCount >= 5) {
+      setClickCount(0);
+      if (!isAdmin) setShowLogin(true);
+    } else {
+      clickTimer.current = setTimeout(() => setClickCount(0), 1500);
+    }
+  };
+
   useEffect(() => {
-    setEvents(loadEvents());
+    loadEvents().then(setEvents);
   }, []);
+
+  const refreshEvents = async () => {
+    const updated = await loadEvents();
+    setEvents(updated);
+  };
 
   const daysInMonth = getDaysInMonth(currentYear, currentMonth);
   const firstDay = getFirstDayOfMonth(currentYear, currentMonth);
 
-  // Count events per day for current month
   const eventCountMap = useMemo(() => {
     const map: Record<number, number> = {};
     for (let d = 1; d <= daysInMonth; d++) {
@@ -51,29 +71,19 @@ const CalendarSection = () => {
   }, [events, currentMonth, currentYear, daysInMonth]);
 
   const prev = () => {
-    if (currentMonth === 0) {
-      setCurrentMonth(11);
-      setCurrentYear((y) => y - 1);
-    } else {
-      setCurrentMonth((m) => m - 1);
-    }
+    if (currentMonth === 0) { setCurrentMonth(11); setCurrentYear((y) => y - 1); }
+    else setCurrentMonth((m) => m - 1);
   };
 
   const next = () => {
-    if (currentMonth === 11) {
-      setCurrentMonth(0);
-      setCurrentYear((y) => y + 1);
-    } else {
-      setCurrentMonth((m) => m + 1);
-    }
+    if (currentMonth === 11) { setCurrentMonth(0); setCurrentYear((y) => y + 1); }
+    else setCurrentMonth((m) => m + 1);
   };
 
   const makeDateKey = (day: number) =>
     `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 
-  const handleDayClick = (day: number) => {
-    setSelectedDateKey(makeDateKey(day));
-  };
+  const handleDayClick = (day: number) => setSelectedDateKey(makeDateKey(day));
 
   const selectedEvents = selectedDateKey ? getEventsForDate(events, selectedDateKey) : [];
 
@@ -82,27 +92,14 @@ const CalendarSection = () => {
     return `${d}/${m}/${y}`;
   };
 
-  const handleSaveEvent = (event: EventItem) => {
-    setEvents((prev) => {
-      const exists = prev.findIndex((e) => e.id === event.id);
-      let updated: EventItem[];
-      if (exists >= 0) {
-        updated = [...prev];
-        updated[exists] = event;
-      } else {
-        updated = [...prev, event];
-      }
-      saveEvents(updated);
-      return updated;
-    });
+  const handleSaveEvent = async (event: EventItem) => {
+    await saveEvent(event);
+    await refreshEvents();
   };
 
-  const handleDeleteEvent = (id: string) => {
-    setEvents((prev) => {
-      const updated = prev.filter((e) => e.id !== id);
-      saveEvents(updated);
-      return updated;
-    });
+  const handleDeleteEvent = async (id: string) => {
+    await deleteEvent(id);
+    await refreshEvents();
   };
 
   return (
@@ -114,30 +111,25 @@ const CalendarSection = () => {
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8 }}
         >
-          <h2 className="heading-display text-center text-3xl md:text-4xl lg:text-5xl">
+          <h2
+            className="heading-display text-center text-3xl md:text-4xl lg:text-5xl cursor-default select-none"
+            onClick={handleTitleClick}
+          >
             <span className="text-gradient-gold">Agenda</span>
           </h2>
         </motion.div>
 
-        {/* Admin controls */}
-        <motion.div
-          className="mt-4 flex items-center justify-center gap-3"
-          initial={{ opacity: 0 }}
-          animate={inView ? { opacity: 1 } : {}}
-          transition={{ duration: 0.8, delay: 0.1 }}
-        >
-          {isAdmin ? (
+        {/* Admin controls - only visible when logged in */}
+        {isAdmin && (
+          <motion.div
+            className="mt-4 flex items-center justify-center gap-3"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+          >
             <AdminLogoutButton />
-          ) : (
-            <button
-              onClick={() => setShowLogin(true)}
-              className="flex items-center gap-2 rounded-full border border-border/30 bg-muted/30 px-4 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
-            >
-              <Lock className="h-3.5 w-3.5" />
-              Admin
-            </button>
-          )}
-        </motion.div>
+          </motion.div>
+        )}
 
         <motion.div
           className="mt-8 glass-strong rounded-2xl p-6 md:p-8"
